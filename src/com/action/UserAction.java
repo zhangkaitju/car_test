@@ -25,6 +25,7 @@ public class UserAction extends ActionSupport implements RequestAware,ServletRes
 	private CarInfoVo carInfoVo;
 	private GpsdataDao gpsdataDao = new GpsdataDaoImpl();
 	
+	@SuppressWarnings("unused")
 	private Map<String, Object> request;
 	public void setRequest(Map<String, Object> request) {
 		this.request = request;

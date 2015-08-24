@@ -2,15 +2,14 @@ package com.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.domain.Gps;
-import com.domain.Gpsdata;
 
 public interface GpsdataDao {
 	
 	/**
-	 * 查找一段时间内车辆路径信息
+	 * 根据参数查找一段时间内车辆信息
+	 * @author zhangkai
 	 * @param carID
 	 * @return
 	 */

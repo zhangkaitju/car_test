@@ -77,7 +77,7 @@
 			#l-map{height:100%;width:78%;float:left;border-right:2px solid #bcbcbc;}
 			#r-result{height:100%;width:20%;float:left;}
 
-
+<!-- script 文件不需要放在head中页面加载时就使用，可以放在body标签结束之前，有助于提高页面加载速率 -->
 		</style>
 		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=XSHyInWf22eub3zzNG6SK8zv"></script>
 		<script language="JavaScript" src="./js/jquery-1.4.2.js"></script>

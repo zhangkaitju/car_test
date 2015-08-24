@@ -2,6 +2,11 @@ package com.domain;
 
 import java.util.Date;
 
+/**
+ * gps对象
+ * @author zhangkai
+ *
+ */
 public class Gpsdata {
 	private String carID;
 	private Date locationDate;

@@ -1,6 +1,5 @@
 package com.vo;
 
-import java.util.Date;
 
 public class CarInfoVo {
 	private String carId;

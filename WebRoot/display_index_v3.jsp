@@ -14,7 +14,10 @@
 		<script type="text/javascript" src="js/api.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 		<script type="text/javascript" src="js/WdatePicker.js"></script>
+		<script type="text/javascript" src="js/selectMap.js"></script>
+		<script type="text/javascript" src="js/customlayer.js"></script>
 		<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+		<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
 
 		<script type="text/javascript">
 			//定义窗体大小，菜单栏大小
@@ -29,6 +32,7 @@
 			//初始化地图，地图中心点是北京
 			function init(){
 				restFrame();
+				loadBMapJScript();
 			}
 			
 			//getMaxDate生成客户端本地时间
@@ -51,10 +55,16 @@
 	<body onResize="restFrame();" onLoad="init();">
 		<span id="tip">正在加载数据,请耐心等待.......</span>
 		<div style="font-size:12px;height:30px;text-align:center;background:#C5CFD6;border-bottom:1px solid #999;">
+			<!-- 
 			从：
 		    <input type="text" name="from" value="" id="from" readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate: getMaxDate(),minDate:getMinDate()})" class="Wdate" />
 			到：
 		    <input type="text" name="to" value="" id="to" readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate: getMaxDate(),minDate:getMinDate()})" class="Wdate" />
+		    -->
+		    时间：
+		    <input type="text" name="from" value="" id="from" readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate: getMaxDate(),minDate:getMinDate()})" class="Wdate" />
+			 <input id="SHOW" onClick="searchMap(document.getElementById('from').value)" type="button" value="查询" />
+			<!-- 
 			频    率：
 		    <select name="freq" id="freq" onchange="PlayBack.Frequency = this.value">
 		        <option value="10000">正常-10</option>
@@ -66,16 +76,39 @@
 		        <option value="10" selected>快得不得了</option>
 		    </select>
 			秒
-		    <input id="SHOW" onClick="showGPSData()" type="button" value="显示" />
+			 -->
+		     <select name="maptype" id="maptype" onchange="">
+		        <option value="1" selected="selected">百度地图</option>
+		        <option value="2">高德地图</option>
+		    </select>
+		    <input id="SHOW" onClick="selectMap()" type="button" value="切换" />
+		    方法：
+			 <select name="choice" id="freq" onchange="">
+		        <option value="1" selected="selected">正常</option>
+		        <option value="2">百度LBS云</option>
+		        <option value="3">高德云图</option>
+		    </select>
+		    <input id="SHOW" onClick="selectChoice()" type="button" value="显示" />
+		    <input id="SHOW" onClick="showHotmap()" type="button" value="热力图" />
 		    <input id="mdTime" type="hidden" value=""/>
 		</div>
 		<div id="map"></div>
+		
+		<script type="text/javascript">
+			//百度地图API功能
+			var map = null;
+			function loadBMapJScript() {
+				var script = document.createElement("script");
+				script.type = "text/javascript";
+				script.src = "http://api.map.baidu.com/api?v=2.0&ak=XSHyInWf22eub3zzNG6SK8zv&callback=initBMap";
+				document.body.appendChild(script);
+			}
+			function initBMap() {
+				map = new BMap.Map("map");            // 创建Map实例
+				var point = new BMap.Point(116.404, 39.915); // 创建点坐标
+				map.centerAndZoom(point,12);
+				map.enableScrollWheelZoom();                 //启用滚轮放大缩小
+			}  
+		</script>
 	</body>     
 </html>
-<script type="text/javascript">
-	var map = new BMap.Map("map");
-	map.centerAndZoom(new BMap.Point(116.39854, 39.99458), 12);
-	
-	map.enableScrollWheelZoom();   //启用滚轮放大缩小，默认禁用
-	map.enableContinuousZoom();    //启用地图惯性拖拽，默认禁用
-</script>

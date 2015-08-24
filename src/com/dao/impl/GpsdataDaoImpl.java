@@ -13,8 +13,13 @@ import com.dao.GpsdataDao;
 import com.domain.Gps;
 import com.jdbc.JDBCUtilSingle;
 
+/**
+ * 数据库查询gps相关操作接口实现类
+ * @author zhangkai
+ *
+ */
 public class GpsdataDaoImpl implements GpsdataDao {
-
+	//根据车辆carid 起始时间查询
 	public List<Gps> find(String carID, Date startTime, Date endTime) {
 		Connection conn = JDBCUtilSingle.getInitJDBCUtil().getConnection();
 		String sql = "SELECT location_x, location_y FROM gpsdata WHERE car_id=? AND location_date>=? AND location_date<=?";
@@ -43,7 +48,7 @@ public class GpsdataDaoImpl implements GpsdataDao {
 		}
 		return gpsList;
 	}
-
+	//根据carID查询指定车辆gps数据
 	public List<Gps> find(String carID) {
 		Connection conn = JDBCUtilSingle.getInitJDBCUtil().getConnection();
 		String sql = "SELECT location_x, location_y FROM gpsdata WHERE car_id=?";
@@ -69,7 +74,7 @@ public class GpsdataDaoImpl implements GpsdataDao {
 		}
 		return gpsList;
 	}
-
+	
 	public List<Gps> find(String carID, Date startTime) {
 		Connection conn = JDBCUtilSingle.getInitJDBCUtil().getConnection();
 		String sql = "SELECT location_x, location_y FROM gpsdata WHERE car_id= ? and location_date < ? order by location_date desc limit 1";

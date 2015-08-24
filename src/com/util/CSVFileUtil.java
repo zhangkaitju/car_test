@@ -46,6 +46,7 @@ public class CSVFileUtil {
     	while (bReadNext) {  
     		while((s = br.readLine()) != null){
     			String[] strArray = s.split(",");
+    			//对数据进行初步的清洗，id不是纯数字的、关键字段为null或者空的、以及长度不足5的去掉
     			if("".equals(strArray[0]) || !strArray[0].matches("[0-9]*") || strArray[0] ==null 
     					||"null".equals(s) || "null".equals(strArray[0]) || strArray.length < 5){
     				//System.out.println(s);

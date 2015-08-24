@@ -6,6 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * jdbc操作
+ * @author zhangkai
+ *
+ */
 public final class JDBCUtilSingle {
 	public static final String url = "jdbc:mysql://localhost:3306/car_data";
 	public static final String name = "com.mysql.jdbc.Driver";

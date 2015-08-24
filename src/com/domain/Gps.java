@@ -1,5 +1,10 @@
 package com.domain;
 
+/**
+ * GPS 对象
+ * @author zhangkai
+ *
+ */
 public class Gps {
 	private String locationX;
 	private String locationY;

@@ -6,17 +6,22 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * 将txt csv文件导入数据库中
+ * @author zhangkai
+ *
+ */
 public class ImportToMysql {
-
 	public static void main(String[] args) {
 		//sString path = "D:\\data\\trajectory";
+		//导入文件路径
 		String path = "D:\\data\\GPSSample\\20121110";
 		File file = new File(path);
 		FileUtile fu = new FileUtile(file);
 		fu.getAllFiles(file);
 		List<File> files = fu.getFileList();
 		
-		//��txt�ļ�����mysql��ݿ���
+		//将txt文件导入mysql数据库
 		String sql = "load data infile ? ignore into table gps201211 character set utf8 fields terminated by ',' lines terminated by '\r\n' (carid,event,carstate,time,longitude,latitude,speed,direction,gpsstate);";
 		Connection conn = JDBCUtilSingle.getInitJDBCUtil().getConnection();
 		PreparedStatement  pst = null;
