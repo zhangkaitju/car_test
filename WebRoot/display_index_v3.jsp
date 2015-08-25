@@ -11,13 +11,19 @@
 			body,html{margin:0px;padding:0px;overflow:hidden;}
 			#tip{position:absolute;z-index:100000;width:auto;padding:5px;color:#039;font-weight:bold;background:#FFF;display:none;}
 		</style>
+		<!-- 百度地图依赖js文件和css文件 -->
 		<script type="text/javascript" src="js/api.js"></script>
+		<!-- 地图图层显示、热力图生成 -->
 		<script type="text/javascript" src="js/main.js"></script>
+		<!-- 日历控件 -->
 		<script type="text/javascript" src="js/WdatePicker.js"></script>
+		<!-- 百度地图、高德地图切换 -->
 		<script type="text/javascript" src="js/selectMap.js"></script>
+		<!-- 自定义百度云图层 -->
 		<script type="text/javascript" src="js/customlayer.js"></script>
 		<script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
-		<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+		<!-- 热力图第三方工具 -->
+		<script type="text/javascript" src="js/Heatmap_min.js"></script>
 
 		<script type="text/javascript">
 			//定义窗体大小，菜单栏大小

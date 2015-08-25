@@ -6,23 +6,25 @@
 <struts>
     <package name="default" namespace="/" extends="struts-default">
         <action name="search" class="com.action.UserAction" method="execute">
-           <result name="success">display_index.jsp</result>
+           <result name="success">display_index_v1.jsp</result>
         </action>
-        
+
          <action name="search2" class="com.action.SearchAction" method="execute">
            <result name="success">display_index_v2.jsp</result>
         </action>
-        
+
          <action name="search3" class="com.action.SearchAction" method="execute">
            <result name="success">show.jsp</result>
         </action>
+
         <action name="search4" class="com.action.SearchAction" method="execute">
            <result name="success">display_index_v3.jsp</result>
         </action>
-        
+
         <action name="search5" class="com.action.BaiduLBSAction" method="execute">
            <result name="success">display_index_v3.jsp</result>
         </action>
+
          <action name="search6" class="com.action.BaiduLBSAction" method="process">
            <result name="success">display_index_v3.jsp</result>
         </action>
