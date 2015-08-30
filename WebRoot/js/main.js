@@ -10,7 +10,7 @@ var selectChoice = function(){
 		//上传文件到lbs
 		//baidulbs();
 		//加载自定义图层
-		addCustomLayer();
+		addBMapCustomLayer();
 	}
 	//使用高德云图
 	if(value == 3){
@@ -22,6 +22,58 @@ var selectChoice = function(){
 };
 //显示热力图
 var showHotmap = function(){
+	//ajax对象，数据提交给后台
+	var value = $("#maptype").val();
+	if(value == 0){}
+	//使用百度热力图
+	if(value == 1){
+		showBMapHotmap();
+	}
+	//使用高德热力图
+	if(value == 2){
+		showAMapHotmap();
+	}
+};
+//在高德地图上展示热力图
+var showAMapHotmap = function(){
+	if (!isSupportCanvas()) {
+		alert('热力图仅对支持canvas的浏览器适用,您所使用的浏览器不能使用热力图功能,请换个浏览器试试~');
+	}
+	var heatmap;
+	var xmlHttpReq=$.post("./search6","",function(data){
+		//回调函数解析返回数据
+		var dataObj = eval("("+data+")");
+		alert(dataObj.length);
+		
+		 map.plugin(["AMap.Heatmap"], function () {
+		      //初始化heatmap对象
+		      heatmap = new AMap.Heatmap(map, {
+		        radius: 25, //给定半径
+		        opacity: [0, 0.8]
+		          /*,gradient:{
+		           0.5: 'blue',
+		           0.65: 'rgb(117,211,248)',
+		           0.7: 'rgb(0, 255, 0)',
+		           0.9: '#ffea00',
+		           1.0: 'red'
+		           }*/
+		      });
+		      //设置数据集
+		      heatmap.setDataSet({
+		        data: dataObj,
+		        max: 100
+		      });
+		    });
+	});
+	//判断浏览区是否支持canvas
+    function isSupportCanvas() {
+      var elem = document.createElement('canvas');
+      return !!(elem.getContext && elem.getContext('2d'));
+    }
+	
+};
+//在百度地图上展示热力图
+var showBMapHotmap = function(){
 	//ajax对象，数据提交给后台
 	var xmlHttpReq=$.post("./search6","",function(data){
 		//回调函数解析返回数据
@@ -46,30 +98,29 @@ var showHotmap = function(){
 	     */
 	
 		heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
-		alert(2222222);
 		map.addOverlay(heatmapOverlay);
 		heatmapOverlay.setDataSet({data:dataObj,max:100});
-		alert(111111111);
-		 function setGradient(){
+
+		function setGradient(){
 		     	/*格式如下所示:
 				{
 			  		0:'rgb(102, 255, 0)',
 			 	 	.5:'rgb(255, 170, 0)',
 				  	1:'rgb(255, 0, 0)'
 				}*/
-		     	var gradient = {};
-		     	var colors = document.querySelectorAll("input[type='color']");
-		     	colors = [].slice.call(colors,0);
-		     	colors.forEach(function(ele){
-					gradient[ele.getAttribute("data-key")] = ele.value; 
-		     	});
-		        heatmapOverlay.setOptions({"gradient":gradient});
-		    }
-			//判断浏览区是否支持canvas
-		    function isSupportCanvas(){
-		        var elem = document.createElement('canvas');
-		        return !!(elem.getContext && elem.getContext('2d'));
-		    }
+			var gradient = {};
+	     	var colors = document.querySelectorAll("input[type='color']");
+	     	colors = [].slice.call(colors,0);
+	     	colors.forEach(function(ele){
+				gradient[ele.getAttribute("data-key")] = ele.value; 
+	     	});
+	        heatmapOverlay.setOptions({"gradient":gradient});
+	    }
+		//判断浏览区是否支持canvas
+		function isSupportCanvas(){
+	        var elem = document.createElement('canvas');
+	        return !!(elem.getContext && elem.getContext('2d'));
+	    }
 	});
 };
 //按时间查询图层
@@ -106,7 +157,27 @@ var searchMap = function(from){
 		document.getElementById('tip').style.display = "none";
 	});
 };
-//叠加云数据图层
+//叠加百度云数据图层
+var customLayer;
+var addBMapCustomLayer = function(){
+	var loadDiv = document.getElementById('tip');
+	loadDiv.style.display = "block";
+	loadDiv.style.top = (document.documentElement.clientHeight - 20) / 2 + "px";
+	loadDiv.style.left = (document.documentElement.clientWidth - 150) / 2 + "px";
+	if (customLayer) {
+		map.removeTileLayer(customLayer);
+	}
+	customLayer=new BMap.CustomLayer({
+		geotableId: 118938,
+		q: '', //检索关键字
+		tags: '', //空格分隔的多字符串
+		filter: '' //过滤条件,参考http://developer.baidu.com/map/lbs-geosearch.htm#.search.nearby
+	});
+	map.addTileLayer(customLayer);
+	customLayer.addEventListener('hotspotclick');
+	document.getElementById('tip').style.display = "none";
+};
+//叠加高德云数据图层
 var addAMapCustomLayer = function(){
 	//加载云图层插件
 	var loadDiv = document.getElementById('tip');
@@ -123,21 +194,7 @@ var addAMapCustomLayer = function(){
 		document.getElementById('tip').style.display = "none";
 	});
 };
-
-var baidulbs = function(){
-	map.clearOverlays(); 
-	//显示数据加载提示
-	var loadDiv = document.getElementById('tip');
-	loadDiv.style.display = "block";
-	loadDiv.style.top = (document.documentElement.clientHeight - 20) / 2 + "px";
-	loadDiv.style.left = (document.documentElement.clientWidth - 150) / 2 + "px";
-	
-	var xmlHttpReq = $.post("./search5","",function(data){
-		var dataObj = eval("("+data+")");
-		document.getElementById('tip').style.display = "none";
-		
-	});
-};
+//使用百度api加载海量点方法
 var showGPSData = function(){
 	//初始化时清除所有覆盖物
 	map.clearOverlays(); 

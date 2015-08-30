@@ -102,7 +102,6 @@ public class BaiduLBSAction extends ActionSupport implements RequestAware,Servle
 				}
 			}
 		}
-		System.out.println("end..");
 		JSONArray jsonarray = new JSONArray();
 		JSONObject jsonObject = null;
 		//将hotpointList List类型转换为热力图使用的JSONArray类型
@@ -114,7 +113,8 @@ public class BaiduLBSAction extends ActionSupport implements RequestAware,Servle
 			jsonarray.add(jsonObject);
 		}
 		//System.out.println(jsonGps.toString());
-		System.out.println("共"+hotpointList.size()+"个点");
+		System.out.println("热力图共"+hotpointList.size()+"个点");
+		System.out.println("end..");
 		PrintWriter out = response.getWriter();
 		//System.out.println(jsonarray.toString());
 		out.print(jsonarray.toString());

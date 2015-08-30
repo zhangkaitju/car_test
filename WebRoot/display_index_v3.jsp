@@ -57,8 +57,54 @@
 				return maxDate; 
 			}
 		</script>
+		<script type="text/javascript">
+			  var xmlHttp;
+			  function createXMLHttpRequest() {
+			     if(window.ActiveXObject){
+			        xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+			     }else if(window.XMLHttpRequest){
+			        xmlHttp=new XMLHttpRequest();
+			     }
+			  }
+			  
+			function select_change(){
+				var maptype=document.getElementById("maptype").value;
+				if(maptype!=null){
+					createXMLHttpRequest();
+					var url="deal.jsp?maptype="+maptype;
+					xmlHttp.open("GET",url,true);
+					xmlHttp.onreadystatechange=showMember;
+					xmlHttp.send(null);
+				}
+			}
+			function showMember(){
+				if (xmlHttp.readyState == 4) {
+					if (xmlHttp.status == 200) {				
+						var membersData = xmlHttp.responseXML.getElementsByTagName("freq");
+						var membersSelect = document.getElementById("freq");
+						var option = null;
+						membersSelect.options.length = 0;
+						for ( var i = 0; i < membersData.length; i++) {
+							//得到节点id
+							var mvalue = membersData[i+1].childNodes[0].firstChild.nodeValue;
+							//得到节点名称
+							var mdisplay=membersData[i+1].childNodes[1].firstChild.nodeValue;
+							var option = new Option(mdisplay,mvalue);
+							try {
+								membersSelect.appendChild(option);
+							} catch (e) {
+								alert(e);
+							}
+						}
+					} else {
+						alert("您请求的页面有异常！");
+					}
+				} else {
+				}
+			}
+		</script>
 	</head>
-	<body onResize="restFrame();" onLoad="init();">
+	<body onResize="restFrame();" onLoad="init() & select_change()">
 		<span id="tip">正在加载数据,请耐心等待.......</span>
 		<div style="font-size:12px;height:30px;text-align:center;background:#C5CFD6;border-bottom:1px solid #999;">
 			<!-- 
@@ -83,16 +129,14 @@
 		    </select>
 			秒
 			 -->
-		     <select name="maptype" id="maptype" onchange="">
-		        <option value="1" selected="selected">百度地图</option>
+		     <select name="maptype" id="maptype" onchange="select_change() & selectMap();" >
+		    	 <option value="0" selected="selected">请选择</option>
+		        <option value="1">百度地图</option>
 		        <option value="2">高德地图</option>
 		    </select>
-		    <input id="SHOW" onClick="selectMap()" type="button" value="切换" />
 		    方法：
 			 <select name="choice" id="freq" onchange="">
-		        <option value="1" selected="selected">正常</option>
-		        <option value="2">百度LBS云</option>
-		        <option value="3">高德云图</option>
+				<option value="0" selected="selected">请选择</option>
 		    </select>
 		    <input id="SHOW" onClick="selectChoice()" type="button" value="显示" />
 		    <input id="SHOW" onClick="showHotmap()" type="button" value="热力图" />

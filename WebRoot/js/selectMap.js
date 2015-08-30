@@ -1,6 +1,7 @@
 var selectMap = function(){
 	//判断显示方法
 	var value = $("#maptype").val();
+	if(value == 0){}
 	//使用百度api海量点接口
 	if(value == 1){
 		loadBMapJScript();

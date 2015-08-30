@@ -46,7 +46,7 @@ public class SearchAction extends ActionSupport implements RequestAware,ServletR
 		
 		JSONArray jsonGps = JSONArray.fromObject(gpsdataList); 
 		//System.out.println(jsonGps.toString());
-		System.out.println("共"+gpsdataList.size()+"个点");
+		System.out.println("共加载"+gpsdataList.size()+"个点");
 		PrintWriter out = response.getWriter();
 		out.print(jsonGps.toString());
 		out.flush();
