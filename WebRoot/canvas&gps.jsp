@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	    <style>
+            html, body {
+                padding: 0px;
+                margin: 0px;
+                font-family: serif;
+            }            
+            .graphView {
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                left: 0px;
+                right: 0px;            
+                z-index: 0;
+            }
+            #map { 
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                left: 0px;
+                right: 0px; 
+                margin: 10px;
+            }
+        </style> 
+
+		<script type="text/javascript" src="js/ht.js"></script>
+		<script type="text/javascript" src="js/gpsx.js"></script>
+		<script type="text/javascript" src="js/randomColor.js"></script>
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=XSHyInWf22eub3zzNG6SK8zv"></script>
+	
+		<script type="text/javascript">
+			//创建GraphView拓扑图组件
+			var dataModel = new ht.DataModel();
+			var graphView = new ht.graph.GraphView(dataModel);              
+			var map = null;   
+
+			function init() {
+				map = new BMap.Map("map");//创建map地图对象
+				var point = new BMap.Point(116.404, 39.915);                                       
+				map.centerAndZoom(point, 4);                    
+				map.enableScrollWheelZoom();                       
+				map.addControl(new BMap.NavigationControl());                               
+
+				map.setMapStyle({
+					features: ["road", "building","water","land"],
+					style:'midnight'
+				});
+				//获取GraphView组件中的view
+				var view = graphView.getView();
+				view.className = 'graphView'; 
+				var mapDiv = document.getElementById('map');
+				//view添加到id为map的div的第二代孩子节点中，这个div是百度地图的遮罩层，将view添加到上面，会使view会是在地图的顶层可见，不会被地图所遮挡
+				mapDiv.firstChild.firstChild.appendChild(view);
+				//百度地图和GraphView的事件监听,监听moveend、 dragend、 zoomend，修改DataModel中所有data的position属性，让其在屏幕上的坐标与地图同步
+				map.addEventListener('movestart', function(e){                   
+				   view.style.opacity = 0;
+				});
+				map.addEventListener('moveend', function(e){
+				   view.style.opacity = 1; 
+				   resetPosition(); 
+				});
+				map.addEventListener('dragstart', function(e){
+				   view.style.opacity = 0;                
+				});
+				map.addEventListener('dragend', function(e){
+				   view.style.opacity = 1; 
+				   resetPosition(); 
+				});                                
+				map.addEventListener('zoomstart', function(e){
+					view.style.opacity = 0;
+				});                
+				map.addEventListener('zoomend', function(e){
+					view.style.opacity = 1;    
+					resetPosition(); 
+				});                
+				//拓扑设置了两个层
+				graphView.setLayers(['nodeLayer']);
+				
+				//判断图元是否可见
+				graphView.isVisible = function(data){
+					return map.getZoom() > 1 || this.isSelected(data);
+				};
+				//判断图元note是否可见，默认当拓扑缩放值大于0.15时可见
+				graphView.isNoteVisible = function(data){
+					return map.getZoom() > 14 || this.isSelected(data);
+				};
+				//获取图元的label，用于在拓扑上显示文字信息，可重载返回自定义文字
+				graphView.getLabel = function(data){
+					if(data instanceof ht.Node){
+						return '经度：' + data.lonLat.lng + '\n维度：' + data.lonLat.lat;
+					}                    
+				};
+				//判断图元label是否可见，默认当拓扑缩放值大于0.15时可见
+				graphView.isLabelVisible = function(data){
+					return map.getZoom() > 14 || this.isSelected(data);
+				}; 
+				//增加交互事件监听器，addInteractorListener的缩写
+				graphView.mi(function(e){
+					if(e.kind === 'endMove'){
+						graphView.sm().each(function(data){
+							if(data instanceof ht.Node){
+							   var position = data.getPosition(),
+								   x = position.x + graphView.tx(),
+								   y = position.y + graphView.ty();  
+								//map.pointToPixel函数将经纬度转换成平面坐标
+							   data.lonLat = map.pixelToPoint(new BMap.Pixel(x,y)); 
+							}                            
+						});
+					}
+				});
+				//将GraphView的Scroll和Pinch两个事件的执行函数设置为空函数，就是当监听到Scroll或者Pinch事件时不做任何的处理，将这两个事件交给map来处理
+				graphView.setAutoScrollZone(-1);
+				graphView.handleScroll = function(){};
+				graphView.handlePinch = function(){};
+
+				var handleClick = function(e){
+					//传入逻辑坐标点或者交互event事件参数，返回当前点下的图元，filter可进行过滤
+					var data = graphView.getDataAt(e);
+					if(data){
+						//调用该方法后，该节点上处理该事件的处理程序将被调用，事件不再被分派到其他节点
+						e.stopPropagation();
+					}
+					//metaKey 事件属性可返回一个布尔值，指示当事件发生时，"meta" 键是否被按下并保持住
+					//ctrlKey 事件属性可返回一个布尔值,指示当事件发生时,Ctrl 键是否被按下并保持住
+					else if(e.metaKey || e.ctrlKey){
+						e.stopPropagation();
+					}
+				};
+				//添加鼠标单击和双击的监听
+				graphView.getView().addEventListener('click', handleClick, false);                
+				graphView.getView().addEventListener('dblclick', handleClick, false);
+				//判断是否为触屏可Touch方式交互
+				graphView.getView().addEventListener(ht.Default.isTouchable ? 'touchstart' : 'mousedown', handleClick, false);
+				
+				window.addEventListener("resize", function(e) {
+					//无效拓扑，并调用延时刷新
+					graphView.invalidate();
+				}, false);                 
+
+				var color = randomColor(),
+					province = null;
+				//以 \n分割数组
+				lines = china.split('\n');
+				for(var i=0; i<lines.length; i++) {
+					//去除字符串左右两端的空格
+					line = lines[i].trim();
+					//以空格分割数组
+					var ss = line.split('\t');
+					if(ss.length === 2){
+						//创建拓扑节点
+						var node = createNode(parseFloat(ss[0]), parseFloat(ss[1]), '', color); 
+						if(province){
+							//连线
+							
+						}else{
+							province = node;
+							node.s({                                   
+								'shape.gradient': 'radial.center',                                    
+								'border.type': 'circle',
+								'border.width': 1,
+								'border.color': 'rgba(200, 200, 200, 0.5)'                                    
+							});
+							node.setSize(15, 15);
+						}
+					}
+					
+				}                
+
+			}
+			//创建节点
+			function createNode(lon, lat, name, color){
+				var node = new ht.Node();
+				node.s({
+					'shape': 'circle',
+					'shape.background': color,                
+					'label.background': 'rgba(255, 255, 0, 0.5)',                    
+					'select.type': 'circle'
+				});
+				//添加到nodeLayer图层
+				node.setLayer('nodeLayer');
+				node.setSize(10, 10);
+				var lonLat = new BMap.Point(lon, lat);
+				//node.setPosition(map.pointToPixel(new BMap.Point(lon, lat)))设置ht.Node对应的平面逻辑坐标
+				node.setPosition(map.pointToPixel(lonLat));
+				node.lonLat = lonLat;
+				graphView.dm().add(node);
+				return node;
+			}            
+
+			function resetPosition(e){
+				//tx获取或设置水平平移值，没有参数时相当于getTranslateX，有参数时相当于setTranslateX
+				//ty获取或设置垂直平移值，没有参数时相当于getTranslateY，有参数时相当于setTranslateY
+				graphView.tx(0);
+				graphView.ty(0);
+				dataModel.each(function(data){
+					if(data instanceof ht.Node){
+						var lonLat = data.lonLat,
+							//map.pointToPixel函数将经纬度转换成平面坐标
+							position = map.pointToPixel(lonLat);   
+						data.setPosition(position.x,position.y);                           
+					}
+				});            
+			}
+	
+		</script>
+		<title>canvas for gps</title>
+	</head>
+	<body onload="init()">
+		<div id="map"></div>
+		
+	</body>
+</html>
+
